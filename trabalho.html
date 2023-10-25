@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta nome="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Adicionando Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Lista de Produtos</title>
+    <style>
+        .card {
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 10px;
+            width: 250px;
+            display: inline-block;
+            text-align: center;
+        }
+        .menu {
+            background-color: #f2f2f2;
+            padding: 10px;
+            text-align: center;
+        }
+        .menu a {
+            padding: 10px;
+            text-decoration: none;
+        }
+        .paginacao {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .search-form {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <a href="#">Início</a>
+        <a href="#">Sobre</a>
+    </div>
+
+    <div class="container mt-5 search-form">
+<form onsubmit="searchprodutos(); return false;">
+  <div class="row">
+    <div class="col"><input type="text" id="searchInput" class="form-control col" placeholder="Buscar produtos..."></div>
+    <div class="col-1"><button type="submit" class="btn btn-primary form-control">Buscar</button></div>
+
+  </div>
+</form>
+</div>
+
+    <h1 class="text-center mt-4">Lista de Produtos</h1>
+    <div id="produto-list" class="container d-flex flex-wrap justify-content-center"></div>
+
+    <div id="paginacao" class="paginacao">
+    </div>
+
+    <!-- Adicionando Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const produtosPerPage = 8;
+        const produtoList = document.getElementById('produto-list');
+        const paginacao = document.getElementById('paginacao');
+        let currentPage = 1;
+
+        const produtos = [
+            { nome: 'Computador Fácil Intel Core i5 8GB HD 1TB', image: './img/imagem1.jpg', descricao: 'R$ 829,00 em até 8x de R$ 103,62', valor: '729,52' },
+            { nome: 'Computador Completo I3 7º 16GB DDR4 ssd 480 Monitor 19 Teclado e Mouse', image: './img/imagem2.jpg', descricao: 'até 8x de R$ 243,75', valor: '1.950,00' },
+            { nome: 'Computador Completo Intel Core i7 16GB SSD 480GB Monitor 19"', image: './img/imagem3.jpg', descricao: 'Em até 10x R$ 160,92 sem juros', valor: '1.609,02' },
+            { nome: 'All in One Positivo Union C4120B-21 Intel - Celeron 4GB 120GB SSD IPS 21,5” Full HD Windows 11', image: './img/imagem4.jpg', descricao: 'ou R$ 2.324,99 em 10x de R$ 232,50 sem juros', valor: '2.092,49' },
+            { nome: 'Notebook Samsung Book Intel Celeron 4GB 256GB SSD - 15,6” Full HD Windows 11 NP550XDA-KP3BR', image: './img/imagem5.jpg', descricao: 'ou R$ 1.999,00 em 10x de R$ 199,90 sem juros', valor: '1.799,10' },
+            { nome: 'Apple notebook MacBook Air de 13 polegadas: Chip M2 da Apple com CPU de oito núcleos e GPU de oito núcleos, de 256 GB SSD - Cinza espacial', image: './img/imagem6.jpg', descricao: 'Em até 10x de R$ 1.329,90 sem juros', valor: '13.299,00' },
+            { nome: 'Webcam Full HD 1080p com microfone, Webcams USB para computador portátil para PC, para chamadas de vídeo, gravação, conferência e jogos (Preto, OneSize)', image: './img/imagem7.jpg', descricao: '', valor: '52,00' },
+            { nome: 'Kit Teclado + Mouse Gamer 6400 DPI Ranger RGB Rainbow Grafite Fortrek', image: './img/imagem8.jpg', descricao: 'Em até 2x de R$ 62,00 sem juros', valor: '123,99' },
+            { nome: 'Impressora Multifuncional Epson Ecotank L3250 - Tanque de Tinta Colorida USB Wi-Fi', image: './img/imagem9.jpg', descricao: 'ou R$ 1.249,00 em 10x de R$ 124,90 sem juros', valor: '1.124,10' },
+            { nome: 'Cartucho de Tinta HP 662 Preto - Original', image: './img/imagem10.jpg', descricao: '3% de desconto no pix', valor: '53,34' },
+            { nome: 'Placa de Vídeo RX 6600 CLD 8G ASRock AMD Radeon, 8GB, GDDR6 - 90-GA2RZZ-00UANF', image: './img/imagem11.jpg', descricao: 'ou R$ 1.315,78 em 10x de R$ 131,58 sem juros', valor: '1.249,99' },
+            { nome: 'Monitor Gamer UltraWide LG 26WQ500-B 25,7” - Full HD 75Hz IPS 1ms HDMI FreeSync', image: './img/imagem12.jpg', descricao: 'ou R$ 979,00 em 8x de R$ 122,38 sem juros', valor: '910,47'},
+            { nome: 'Mouse sem Fio Logitech Óptico 1000DPI 3 Botões - M170 Preto', image: './img/imagem13.jpg', descricao: '7% de desconto no pix', valor: '64,16' },
+            { nome: 'Notebook Samsung Book Intel Core i3 4GB - 256GB SSD 15,6” Full HD Windows 11 NP550XDA-KV3BR', image: './img/imagem14.jpg', descricao: 'ou R$ 2.199,00 em 10x de R$ 219,90 sem juros', valor: '1.979,10' },
+            { nome: 'Cartão de Memória 64gb Micro Sd Ultra 100mbs Sandisk', image: './img/imagem15.jpg', descricao: '17% de desconto no pix', valor: '40,66' },           
+            // Adicione mais produtos...
+        ];
+
+        function displayprodutos(page) {
+            produtoList.innerHTML = '';
+            const start = (page - 1) * produtosPerPage;
+            const end = start + produtosPerPage;
+            const displayprodutos = produtos.slice(start, end);
+            displayprodutos.forEach(produto => {
+                produtoList.innerHTML += `<div class="card">
+                                            <img src="${produto.image}" alt="${produto.nome}" width="150" height="150">
+                                            <h5>${produto.nome}</h5>
+                                            <p>${produto.descricao}</p>
+                                            <p>R$ ${produto.valor}</p>
+                                         </div>`;
+            });
+
+            // Atualizar a paginação
+            const totalPages = Math.ceil(produtos.length / produtosPerPage);
+            let paginacaoHTML = '';
+
+            paginacaoHTML += `
+            <button class="btn btn-primary m-2" onclick="goToPage(1)">Primeiro</button>
+            <button class="btn btn-primary m-2" onclick="previousPage()">Anterior</button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    paginacaoHTML += `<button class="btn btn-secondary m-2" onclick="goToPage(${i})">${i}</button>`;
+                } else {
+                    paginacaoHTML += `<button class="btn btn-primary m-2" onclick="goToPage(${i})">${i}</button>`;
+                }
+            }
+
+            paginacaoHTML += `
+            <button class="btn btn-primary m-2" onclick="nextPage()">Próximo</button>
+            <button class="btn btn-primary m-2" onclick="goToPage(${totalPages})">Último</button>
+            `;
+
+            paginacao.innerHTML = paginacaoHTML;
+        }
+
+        function nextPage() {
+            if (currentPage < Math.ceil(produtos.length / produtosPerPage)) {
+                currentPage++;
+                displayprodutos(currentPage);
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayprodutos(currentPage);
+            }
+        }
+
+        function goToPage(page) {
+            if (page < 1) {
+                page = 1;
+            } else if (page > Math.ceil(produtos.length / produtosPerPage)) {
+                page = Math.ceil(produtos.length / produtosPerPage);
+            }
+            currentPage = page;
+            displayprodutos(currentPage);
+        }
+
+        function searchprodutos() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredprodutos = produtos.filter(produto => produto.nome.toLowerCase().includes(searchTerm));
+            produtoList.innerHTML = '';
+            filteredprodutos.forEach(produto => {
+                produtoList.innerHTML += `<div class="card">
+                                            <img src="${produto.image}" alt="${produto.nome}" width="150" height="150">
+                                            <h4>${produto.nome}</h4>
+                                            <p>${produto.descricao}</p>
+                                            <p>R$ ${produto.valor}</p>
+                                         </div>`;
+            });
+        }
+
+        displayprodutos(currentPage);
+    </script>
+</body>
+</html>
